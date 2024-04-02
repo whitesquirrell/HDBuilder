@@ -1,5 +1,6 @@
 package com.example.stacker
 
+import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.stacker.ui.screens.GameScreen
+import com.example.stacker.ui.screens.TitleScreen
 
 object Destinations {
     const val TITLE_SCREEN = "title"
@@ -53,43 +56,5 @@ fun Navigation() {
     }
 }
 
-@Composable
-fun TitleScreen(navController: NavController){
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Title Screen",
-        )
-        FloatingActionButton(
-            onClick = {
-                navController.navigate(Screen.GameScreen.route)
-            },
-            modifier = Modifier
-                .shadow(ambientColor = Color.Red, elevation = 1.dp)
-        ) {
-            Text(text =  "Start Game")
-        }
-    }
-}
 
-@Composable
-fun GameScreen(navController: NavController){
-    Column {
-        Text(
-            text = "Game Screen",
-        )
 
-        Button(
-            onClick = {
-                navController.navigate(Screen.TitleScreen.route)
-            },
-            modifier = Modifier.align(Alignment.End),
-
-        ) {
-            Text(text = "Go back(pls delete)")
-        }
-    }
-}
