@@ -15,6 +15,11 @@ import com.example.stacker.R
 import androidx.compose.foundation.background
 import androidx.compose.ui.res.colorResource
 import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import java.time.format.TextStyle
 
 
 @Composable
@@ -44,10 +49,14 @@ fun TitleScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(480.dp))
 
-            Button(
-                onClick = { navController.navigate(Screen.GameScreen.route) }
+            FloatingActionButton(
+                onClick = { navController.navigate(Screen.GameScreen.route) },
             ) {
-                Text(text = "Start Game")
+                Text(text = "Start",
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.displaySmall,
+                    modifier = Modifier.padding(start = 30.dp, end= 30.dp)
+                )
             }
         }
     }
