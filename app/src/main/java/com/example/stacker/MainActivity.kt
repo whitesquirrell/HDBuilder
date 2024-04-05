@@ -1,5 +1,6 @@
 package com.example.stacker
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,7 @@ import com.example.stacker.ui.theme.StackTheBlockTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        startBackgroundMusicService()
         setContent {
             StackTheBlockTheme {
                 // A surface container using the 'background' color from the theme
@@ -26,6 +28,25 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+    private fun startBackgroundMusicService() {
+        val serviceIntent = Intent(this, BackgroundMusicService::class.java)
+        startService(serviceIntent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopBackgroundMusicService()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stopBackgroundMusicService()
+    }
+
+    private fun stopBackgroundMusicService() {
+        val serviceIntent = Intent(this, BackgroundMusicService::class.java)
+        stopService(serviceIntent)
     }
 }
 

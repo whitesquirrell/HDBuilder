@@ -14,17 +14,14 @@ import com.example.stacker.Screen
 import com.example.stacker.R
 import androidx.compose.foundation.background
 import androidx.compose.ui.res.colorResource
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
-import java.time.format.TextStyle
 
 
 @Composable
 fun TitleScreen(navController: NavController) {
-    val backgroundImage = painterResource(id = R.drawable.stacktheblocks)
+    val backgroundImage = painterResource(id = R.drawable.stacktheblocks3)
     val backgroundColor = colorResource(
         id = R.color.background
     )
