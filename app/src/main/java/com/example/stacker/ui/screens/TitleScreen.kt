@@ -30,13 +30,16 @@ fun TitleScreen(navController: NavController) {
     )
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(backgroundColor)
     ) {
         Image(
             painter = backgroundImage,
             contentDescription = "Background",
-            modifier = Modifier.fillMaxSize().offset(y = (-50).dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .offset(y = (-50).dp),
             contentScale = ContentScale.Fit // Ensures the image covers the available space
         )
 
@@ -53,6 +56,18 @@ fun TitleScreen(navController: NavController) {
                 onClick = { navController.navigate(Screen.GameScreen.route) },
             ) {
                 Text(text = "Start",
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.displaySmall,
+                    modifier = Modifier.padding(start = 30.dp, end= 30.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            FloatingActionButton(
+                onClick = { navController.navigate(Screen.ScoreScreen.route) },
+            ) {
+                Text(text = "Scoreboard",
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(start = 30.dp, end= 30.dp)
