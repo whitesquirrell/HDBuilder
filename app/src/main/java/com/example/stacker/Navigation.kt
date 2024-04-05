@@ -45,7 +45,7 @@ object Destinations {
     const val SCORE_SCREEN = "score"
 }
 @Composable
-fun Navigation() {
+fun Navigation(context: Context) {
     val navController: NavHostController = rememberNavController()
     NavHost(navController = navController, startDestination =  Screen.TitleScreen.route) {
         composable(route = Screen.TitleScreen.route) {
@@ -55,7 +55,7 @@ fun Navigation() {
         composable(
             route = Screen.GameScreen.route,
         ){ entry ->
-            GameScreen(navController = navController)
+            GameScreen(navController = navController, context = context)
         }
 
         composable(

@@ -1,7 +1,9 @@
 package com.example.stacker.ui.screens
 
 import android.R
+import android.content.Context
 import android.graphics.BitmapFactory
+import android.media.MediaPlayer
 import android.widget.ImageView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -36,22 +38,24 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.navigation.NavController
 import com.example.stacker.Screen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(navController: NavController){
+fun GameScreen(navController: NavController, context: Context){
 
 
     var isTap by remember { mutableStateOf(false) }
     var isDoubleTap by remember { mutableStateOf(false) }
     var isPause: MutableState<Boolean> = remember { mutableStateOf(false) }
 
-
-    // Images
+    // Images & Sound
     val backgroundImage = painterResource(id = com.example.stacker.R.drawable.lky_transparent)
+    val blockDrop: MediaPlayer = MediaPlayer.create(context, com.example.stacker.R.raw.block_drop)
+    val towerCrash: MediaPlayer = MediaPlayer.create(context, com.example.stacker.R.raw.tower_crash)
 
     // Game Variable
     var buildingX by remember { mutableIntStateOf(0) }
@@ -98,8 +102,12 @@ fun GameScreen(navController: NavController){
     Column(
         Modifier.pointerInput(Unit) {
                 detectTapGestures (
-                    onTap = { isTap = true },
-                    onDoubleTap = {isDoubleTap = true}
+                    onTap = {
+                        blockDrop.start()
+                        isTap = true },
+                    onDoubleTap = {
+                        towerCrash.start()
+                        isDoubleTap = true}
 //                    onDoubleTap = {},
 //                    onLongPress = {}
                 )
