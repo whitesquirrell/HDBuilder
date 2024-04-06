@@ -73,9 +73,9 @@ fun Navigation(context: Context) {
         }
 
         composable(
-            route = "record_score_screen/{score}",
+            route = "${Screen.RecordScoreScreen.route}/{score}",
         ) { backStackEntry ->
-            val score: Int = backStackEntry.arguments?.getInt("score") ?: -1
+            val score: Int = (backStackEntry.arguments?.getString("score"))?.toInt() ?: -1
             RecordScoreScreen(navController = navController, score = score)
         }
     }

@@ -68,7 +68,7 @@ fun RecordScoreScreen(navController: NavController, score: Int) {
             TextField(
                 value = text,
                 onValueChange = { text = it },
-                label = { Text("Label") }
+                label = { Text("Name") }
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -93,7 +93,6 @@ fun submitScore(name: String, score: Int) {
     val database = FirebaseDatabase.getInstance("https://stacktheblocks-2764e-default-rtdb.asia-southeast1.firebasedatabase.app")
     val myRef = database.getReference("/")
     val scoresRef = database.getReference("scores")
-
     val score = Score(name, score)
     val newScoreRef = scoresRef.push()
     newScoreRef.setValue(score)

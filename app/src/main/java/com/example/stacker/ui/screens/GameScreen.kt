@@ -10,6 +10,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,13 +30,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -42,10 +48,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.stacker.Screen
 import com.example.stacker.model.BuildingDetail
+import kotlinx.coroutines.android.awaitFrame
 import kotlin.math.sqrt
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -111,6 +121,7 @@ fun GameScreen(navController: NavController, context: Context){
 
     var buildingXOffset by remember { mutableIntStateOf(BUILDING_INIT_X_OFFSET) }
     var buildingYOffset by remember { mutableIntStateOf(BUILDING_INIT_Y_OFFSET) }
+    var buildingRotation by remember { mutableFloatStateOf(0f) }
 
     var isMovingRight by remember { mutableStateOf(true) }
     var isBuildingDropping by remember { mutableStateOf(false) }
@@ -118,6 +129,7 @@ fun GameScreen(navController: NavController, context: Context){
 
     var buildingDropSpeed by remember { mutableIntStateOf(1) }
     var buildingNumber by remember { mutableIntStateOf(0) }
+    var score by remember { mutableIntStateOf(0) }
     var buildingDesign by remember { mutableIntStateOf(0) }
 
     val buildingStackList = remember { mutableStateListOf<BuildingDetail>(
@@ -160,8 +172,6 @@ fun GameScreen(navController: NavController, context: Context){
 
         ) {
 
-
-
         itemsIndexed(buildingStackList.reversed()) { _, item ->
             BuildingImage(
                 buildingXOffset = item.buildingXOffset,
@@ -171,6 +181,7 @@ fun GameScreen(navController: NavController, context: Context){
                 buildingDesign = item.buildingDesign,
             )
         }
+
 }
     Box(
     ){
@@ -180,7 +191,8 @@ fun GameScreen(navController: NavController, context: Context){
             modifier = Modifier
                 .offset(x = buildingXOffset.dp, y = buildingYOffset.dp)
 //                .size(BUILDING_SIZE.dp)
-                .size(height=BUILDING_BASE_HEIGHT.dp, width=BUILDING_BASE_WIDTH.dp)
+                .size(height = BUILDING_BASE_HEIGHT.dp, width = BUILDING_BASE_WIDTH.dp)
+                .rotate(buildingRotation)
                 .padding(0.dp),
             contentDescription = null, // Set your content description here
             painter = painterResource(id = buildingDesign)
@@ -211,13 +223,24 @@ fun GameScreen(navController: NavController, context: Context){
             }
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = { isBuildingDropping = true; blockDrop.start() },
+                    onTap = {
+                        isBuildingDropping = true; blockDrop.start(); haptic.performHapticFeedback(
+                        HapticFeedbackType.LongPress
+                    )
+                    },
 //                    onDoubleTap = { isDoubleTap = true; towerCrash.start() }
                 )
             }
             .fillMaxWidth()
     ) {
-        PauseComponent(navController, pauseFlag)
+        Row(
+        ) {
+            PauseComponent(navController, pauseFlag)
+            Spacer(Modifier.weight(1f))
+            Text(text = "Score\n${score}", modifier = Modifier
+                .padding(end = 20.dp, top = 30.dp)
+                .size(80.dp), textAlign = TextAlign.Right, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+        }
 
         if (pauseFlag.value || !isBuildingDropping) {
 
@@ -231,6 +254,16 @@ fun GameScreen(navController: NavController, context: Context){
             if (buildingYOffset > stackOffset) {
                 buildingYOffset = stackOffset
             }
+            return
+        }
+
+        if(!(buildingXOffset <= SCREEN_WIDTH/2 && buildingXOffset > (SCREEN_WIDTH/2)-BUILDING_BASE_WIDTH)){
+
+            //Simple Lose effect :)
+            buildingRotation = 180f
+            towerCrash.start()
+            navController.navigate(Screen.RecordScoreScreen.route+"/${score}")
+
             return
         }
 
@@ -249,11 +282,16 @@ fun GameScreen(navController: NavController, context: Context){
                 buildingWidth = BUILDING_VAR_1_WIDTH
             )
         )
+        score++
         stackHeight += BUILDING_VAR_1_HEIGHT
         if (stackHeight > SCREEN_HEIGHT / 2) {
             var lowestBuilding = buildingStackList.removeFirst()
             stackHeight -= lowestBuilding.buildingHeight
         }
+        if(buildingNumber % 5 == 0){
+            buildingMovementSpeed += 1
+        }
+        buildingXOffset = BUILDING_INIT_X_OFFSET
     }
 }
 
@@ -266,7 +304,7 @@ fun BuildingImage(buildingXOffset: Int, buildingYOffset:Int,
     return Image(
         modifier = Modifier
             .absoluteOffset(x = buildingXOffset.dp, y = buildingYOffset.dp)
-            .size(height=buildingHeight.dp, width=buildingWidth.dp),
+            .size(height = buildingHeight.dp, width = buildingWidth.dp),
 //            .aspectRatio(painter.intrinsicSize.width / painter.intrinsicSize.height),
 //            .background(Color.Black),
         contentDescription = null, // Set your content description here
@@ -295,6 +333,7 @@ fun PauseComponent(navController: NavController, isPause: MutableState<Boolean>)
 
     val interactionSource = remember { MutableInteractionSource() }
 
+
     val imageSource = when (isPauseButtonActive) {
         true -> com.example.stacker.R.drawable.pause_active
         else -> com.example.stacker.R.drawable.pause_inactive
@@ -318,6 +357,7 @@ fun PauseComponent(navController: NavController, isPause: MutableState<Boolean>)
                 .fillMaxSize()
         )
     }
+
 }
 
 @Composable
