@@ -35,6 +35,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.stacker.ui.screens.BackgroundScreen
 import com.example.stacker.ui.screens.GameScreen
 import com.example.stacker.ui.screens.ScoreScreen
 import com.example.stacker.ui.screens.TitleScreen
@@ -45,6 +46,7 @@ object Destinations {
     const val GAME_SCREEN = "game"
     const val SCORE_SCREEN = "score"
     const val RECORD_SCORE_SCREEN = "record_score"
+    const val BACKGROUND_SCREEN = "background"
 }
 @Composable
 fun Navigation(context: Context) {
@@ -52,6 +54,10 @@ fun Navigation(context: Context) {
     NavHost(navController = navController, startDestination =  Screen.TitleScreen.route) {
         composable(route = Screen.TitleScreen.route) {
             TitleScreen(navController = navController)
+        }
+
+        composable(route = Screen.BackgroundScreen.route) {
+            BackgroundScreen(navController = navController)
         }
 
         composable(

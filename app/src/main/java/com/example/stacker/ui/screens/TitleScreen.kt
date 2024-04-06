@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun TitleScreen(navController: NavController) {
-    val backgroundImage = painterResource(id = R.drawable.stacktheblocks3)
+    val backgroundImage = painterResource(id = R.drawable.stackthehdb)
     val backgroundColor = colorResource(
         id = R.color.background
     )
@@ -50,7 +50,7 @@ fun TitleScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(480.dp))
 
             FloatingActionButton(
-                onClick = { navController.navigate(Screen.GameScreen.route) },
+                onClick = { navController.navigate(Screen.BackgroundScreen.route) },
             ) {
                 Text(text = "Start",
                     fontWeight = FontWeight.SemiBold,
