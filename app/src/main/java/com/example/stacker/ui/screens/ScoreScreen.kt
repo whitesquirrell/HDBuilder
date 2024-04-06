@@ -23,11 +23,12 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 private lateinit var database: DatabaseReference
+
 @Composable
 fun ScoreScreen(navController: NavController) {
 
     val backgroundImage = painterResource(id = R.drawable.lky_transparent)
-    database = Firebase.database.reference
+    val database = Firebase.database.reference
 
     Box(
         modifier = Modifier
