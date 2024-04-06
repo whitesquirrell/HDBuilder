@@ -3,6 +3,8 @@ package com.example.stacker.ui.screens
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaPlayer
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -70,6 +72,8 @@ fun GameScreen(navController: NavController, context: Context){
     var isTap by remember { mutableStateOf(false) }
 //    var isDoubleTap by remember { mutableStateOf(false) }
     var playableAreaHeightDP by remember { mutableIntStateOf(0) }
+
+    val vibrator = context.getSystemService(Vibrator::class.java)
 
     // Images
 
@@ -224,9 +228,8 @@ fun GameScreen(navController: NavController, context: Context){
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
-                        isBuildingDropping = true; blockDrop.start(); haptic.performHapticFeedback(
-                        HapticFeedbackType.LongPress
-                    )
+                        isBuildingDropping = true; blockDrop.start(); vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+
                     },
 //                    onDoubleTap = { isDoubleTap = true; towerCrash.start() }
                 )
