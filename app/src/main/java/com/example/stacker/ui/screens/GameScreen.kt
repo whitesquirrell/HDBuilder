@@ -1,6 +1,7 @@
 package com.example.stacker.ui.screens
 
 import android.R
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
@@ -130,7 +131,7 @@ fun GameScreen(navController: NavController, context: Context){
     val BUILDING_INIT_Y_OFFSET = 0
     val BUILDING_DROP_STOP_Y_OFFSET = playableAreaHeightDP/3
     val BUILDING_STACK_ADD_OFFSET = BUILDING_SIZE/4 + 8
-    val BUILDING_STACK_BASE_OFFSET = BUILDING_SIZE/10
+    val BUILDING_STACK_BASE_OFFSET = BUILDING_SIZE/10 + 2
 
     var buildingXOffset by remember { mutableIntStateOf(BUILDING_INIT_X_OFFSET) }
     var buildingYOffset by remember { mutableIntStateOf(BUILDING_INIT_Y_OFFSET) }
@@ -163,48 +164,34 @@ fun GameScreen(navController: NavController, context: Context){
 
         ) {
 
-        items(items = buildingStackList.reversed(), key = {build -> build.id}) { item ->
-
-
-            if (item.id == 0) {
-                getBuildingImage(
-                    buildingXOffset = item.buildingXOffset,
-                    buildingYOffset = BUILDING_STACK_BASE_OFFSET,
-                    buildingSize = BUILDING_SIZE,
-                    buildingDesign = item.buildingDesign
-                )
-            } else {
-                getBuildingImage(
-                    buildingXOffset = item.buildingXOffset,
-                    buildingYOffset = BUILDING_STACK_BASE_OFFSET + BUILDING_STACK_ADD_OFFSET * item.id,
-                    buildingSize = BUILDING_SIZE,
-                    buildingDesign = item.buildingDesign
-                )
-            }
-
-
-        }
-
-//        itemsIndexed(buildingStackList.reversed()) { index, item ->
+//        items(items = buildingStackList.reversed(), key = {build -> build.id}) { item ->
 //
-//            if (item.id == 0) {
-//                getBuildingImage(
-//                    buildingXOffset = item.buildingXOffset,
-//                    buildingYOffset = BUILDING_STACK_BASE_OFFSET,
-//                    buildingSize = BUILDING_SIZE,
-//                    buildingDesign = item.buildingDesign
-//                )
-//            } else {
+//
+
 //                getBuildingImage(
 //                    buildingXOffset = item.buildingXOffset,
 //                    buildingYOffset = BUILDING_STACK_BASE_OFFSET + BUILDING_STACK_ADD_OFFSET * item.id,
 //                    buildingSize = BUILDING_SIZE,
 //                    buildingDesign = item.buildingDesign
 //                )
-//            }
+//
 //
 //
 //        }
+
+        itemsIndexed(buildingStackList.reversed()) { index, item ->
+
+
+                getBuildingImage(
+                    buildingXOffset = item.buildingXOffset,
+                    buildingYOffset = BUILDING_STACK_BASE_OFFSET + BUILDING_STACK_ADD_OFFSET * item.id,
+                    buildingSize = BUILDING_SIZE,
+                    buildingDesign = item.buildingDesign
+                )
+
+
+
+        }
 
 }
 
@@ -398,8 +385,8 @@ fun getBuildingImage(buildingXOffset: Int, buildingYOffset:Int, buildingSize: In
         contentScale = ContentScale.FillBounds
     )
 
-    }
 }
+
 
 //@Composable
 //fun GameBuilding(nacController: NavController, isPause: MutableState<Boolean>) {
