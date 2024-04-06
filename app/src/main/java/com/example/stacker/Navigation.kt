@@ -38,11 +38,13 @@ import androidx.navigation.navArgument
 import com.example.stacker.ui.screens.GameScreen
 import com.example.stacker.ui.screens.ScoreScreen
 import com.example.stacker.ui.screens.TitleScreen
+import com.example.stacker.ui.screens.RecordScoreScreen
 
 object Destinations {
     const val TITLE_SCREEN = "title"
     const val GAME_SCREEN = "game"
     const val SCORE_SCREEN = "score"
+    const val RECORD_SCORE_SCREEN = "record_score"
 }
 @Composable
 fun Navigation(context: Context) {
@@ -62,6 +64,13 @@ fun Navigation(context: Context) {
             route = Screen.ScoreScreen.route,
         ) { entry ->
             ScoreScreen(navController = navController)
+        }
+
+        composable(
+            route = "record_score_screen/{score}",
+        ) { backStackEntry ->
+            val score: Int = backStackEntry.arguments?.getInt("score") ?: -1
+            RecordScoreScreen(navController = navController, score = score)
         }
     }
 }
