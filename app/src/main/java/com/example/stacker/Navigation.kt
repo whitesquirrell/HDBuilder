@@ -36,14 +36,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.stacker.ui.screens.GameScreen
+import com.example.stacker.ui.screens.ScoreScreen
 import com.example.stacker.ui.screens.TitleScreen
 
 object Destinations {
     const val TITLE_SCREEN = "title"
     const val GAME_SCREEN = "game"
+    const val SCORE_SCREEN = "score"
 }
 @Composable
-fun Navigation() {
+fun Navigation(context: Context) {
     val navController: NavHostController = rememberNavController()
     NavHost(navController = navController, startDestination =  Screen.TitleScreen.route) {
         composable(route = Screen.TitleScreen.route) {
@@ -53,7 +55,13 @@ fun Navigation() {
         composable(
             route = Screen.GameScreen.route,
         ){ entry ->
-            GameScreen(navController = navController)
+            GameScreen(navController = navController, context = context)
+        }
+
+        composable(
+            route = Screen.ScoreScreen.route,
+        ) { entry ->
+            ScoreScreen(navController = navController)
         }
     }
 }

@@ -1,11 +1,11 @@
 package com.example.stacker.ui.screens
 
-import android.annotation.SuppressLint
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import android.R
+import android.content.Context
+import android.graphics.BitmapFactory
+import android.media.MediaPlayer
+import android.widget.ImageView
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +17,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
@@ -57,6 +58,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.navigation.NavController
 import com.example.stacker.Screen
 import com.example.stacker.model.BuildingDetail
@@ -75,7 +77,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(navController: NavController){
+fun GameScreen(navController: NavController, context: Context){
 
 
 
@@ -85,7 +87,11 @@ fun GameScreen(navController: NavController){
     var playableAreaHeightDP by remember { mutableIntStateOf(0) }
 
     // Images
+
+    // Images & Sound
     val backgroundImage = painterResource(id = com.example.stacker.R.drawable.lky_transparent)
+    val blockDrop: MediaPlayer = MediaPlayer.create(context, com.example.stacker.R.raw.block_drop)
+    val towerCrash: MediaPlayer = MediaPlayer.create(context, com.example.stacker.R.raw.tower_crash)
 
     // Game Variable
     var buildingX by remember { mutableIntStateOf(0) }
@@ -261,8 +267,8 @@ fun GameScreen(navController: NavController){
             }
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = { isBuildingDropping = true },
-                    onDoubleTap = { isDoubleTap = true }
+                    onTap = { isBuildingDropping = true; blockDrop.start() },
+                    onDoubleTap = { isDoubleTap = true; towerCrash.start() }
 //                    onDoubleTap = {},
 //                    onLongPress = {}
                 )
@@ -392,6 +398,7 @@ fun getBuildingImage(buildingXOffset: Int, buildingYOffset:Int, buildingSize: In
         contentScale = ContentScale.FillBounds
     )
 
+    }
 }
 
 //@Composable
@@ -459,6 +466,3 @@ fun getScreenWidth(): Int {
     val configuration = LocalConfiguration.current
     return configuration.screenWidthDp
 }
-
-
-
