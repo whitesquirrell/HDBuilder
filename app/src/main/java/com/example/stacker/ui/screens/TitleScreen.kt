@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun TitleScreen(navController: NavController) {
-    val backgroundImage = painterResource(id = R.drawable.stackthehdb)
+    val backgroundImage = painterResource(id = R.drawable.hdbuilder)
     val backgroundColor = colorResource(
         id = R.color.background
     )

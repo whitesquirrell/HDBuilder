@@ -35,7 +35,7 @@ fun RecordScoreScreen(navController: NavController, score: Int) {
     val backgroundColor = colorResource(
         id = R.color.background
     )
-    var text by remember { mutableStateOf("Kuan Yew") }
+    var text by remember { mutableStateOf("Anonymous") }
 
     Box(
         modifier = Modifier

@@ -12,11 +12,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.stacker.ui.theme.StackTheBlockTheme
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+object ThreadPool {
+    private val pool : ExecutorService = Executors.newFixedThreadPool(4)
+
+    fun execute(func: Runnable) {
+        pool.execute(func)
+    }
+
+    fun shutdown() {
+        pool.shutdown()
+    }
+}
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startBackgroundMusicService()
+
+
+        ThreadPool.execute(BGMThread(this))
+
+//        startBackgroundMusicService()
         setContent {
             StackTheBlockTheme {
                 // A surface container using the 'background' color from the theme
@@ -29,24 +48,33 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    private fun startBackgroundMusicService() {
-        val serviceIntent = Intent(this, BackgroundMusicService::class.java)
-        startService(serviceIntent)
-    }
+//    private fun startBackgroundMusicService() {
+//        val serviceIntent = Intent(this, BackgroundMusicService::class.java)
+//        startService(serviceIntent)
+//    }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopBackgroundMusicService()
+        ThreadPool.shutdown()
+//        stopBackgroundMusicService()
     }
 
     override fun onStop() {
         super.onStop()
-        stopBackgroundMusicService()
+        ThreadPool.shutdown()
+//        stopBackgroundMusicService()
     }
 
-    private fun stopBackgroundMusicService() {
-        val serviceIntent = Intent(this, BackgroundMusicService::class.java)
-        stopService(serviceIntent)
+//    private fun stopBackgroundMusicService() {
+//        val serviceIntent = Intent(this, BackgroundMusicService::class.java)
+//        stopService(serviceIntent)
+//    }
+}
+
+class BGMThread(private val main : ComponentActivity) : Runnable{
+    override fun run() {
+        val serviceIntent = Intent(main, BackgroundMusicService::class.java)
+        main.startService(serviceIntent)
     }
 }
 
