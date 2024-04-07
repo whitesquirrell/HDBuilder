@@ -60,13 +60,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.stacker.Screen
 import com.example.stacker.model.BuildingDetail
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.android.awaitFrame
 import java.util.concurrent.locks.ReentrantLock
 import kotlinx.coroutines.withContext
 import kotlin.math.sqrt
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
