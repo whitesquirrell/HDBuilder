@@ -60,7 +60,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.stacker.Screen
 import com.example.stacker.model.BuildingDetail
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.android.awaitFrame
+import java.util.concurrent.locks.ReentrantLock
+import kotlinx.coroutines.withContext
 import kotlin.math.sqrt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -162,6 +165,7 @@ fun GameScreen(navController: NavController, context: Context){
             buildingYOffset = 0
         ))};
 
+    val buildingListLock = ReentrantLock()
 
 
     var stackHeight by remember {mutableIntStateOf(BUILDING_BASE_HEIGHT)}
@@ -336,13 +340,35 @@ fun GameScreen(navController: NavController, context: Context){
             return
         }
 
+        fun addBuilding(building: BuildingDetail) {
+            buildingListLock.lock()
+            try {
+                buildingStackList.add(building)
+            } finally {
+                buildingListLock.unlock()
+            }
+        }
+
+        fun removeFirstBuilding(): BuildingDetail? {
+            buildingListLock.lock()
+            try {
+                return if (buildingStackList.isNotEmpty()) {
+                    stackHeight -= buildingStackList.first().buildingHeight
+                    buildingStackList.removeFirst()
+                } else {
+                    null
+                }
+            } finally {
+                buildingListLock.unlock()
+            }
+        }
         // Down is positive offset
         buildingAlpha = 1f
         isBuildingDropping = false
         buildingYOffset = BUILDING_INIT_Y_OFFSET
         buildingDropSpeed = 1
 
-        buildingStackList.add(
+        addBuilding(
             BuildingDetail(
                 id = buildingNumber++,
                 buildingDesign = com.example.stacker.R.drawable.building_1_t,
@@ -352,12 +378,23 @@ fun GameScreen(navController: NavController, context: Context){
                 buildingWidth = BUILDING_VAR_1_WIDTH
             )
         )
+//        buildingStackList.add(
+//            BuildingDetail(
+//                id = buildingNumber++,
+//                buildingDesign = com.example.stacker.R.drawable.building_1_t,
+//                buildingXOffset = buildingXOffset,
+//                buildingYOffset = 0,
+//                buildingHeight = BUILDING_VAR_1_HEIGHT,
+//                buildingWidth = BUILDING_VAR_1_WIDTH
+//            )
+//        )
         score++
         buildingAlpha = 0.3f
         stackHeight += BUILDING_VAR_1_HEIGHT
         if (stackHeight > SCREEN_HEIGHT / 2) {
-            var lowestBuilding = buildingStackList.removeFirst()
-            stackHeight -= lowestBuilding.buildingHeight
+            removeFirstBuilding()
+//            var lowestBuilding = buildingStackList.removeFirst()
+//            stackHeight -= lowestBuilding.buildingHeight
         }
         if(buildingNumber % 5 == 0){
             buildingMovementSpeed += 1
@@ -441,6 +478,7 @@ fun getScreenWidth(): Int {
     val configuration = LocalConfiguration.current
     return configuration.screenWidthDp
 }
+
 
 /*
 
