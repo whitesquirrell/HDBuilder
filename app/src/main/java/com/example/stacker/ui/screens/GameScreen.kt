@@ -106,7 +106,7 @@ fun GameScreen(navController: NavController, context: Context){
     val elapsedTimer = remember { ElapsedTimer() }
     val frameTimeMillis = 1000L / 60L  // For 60 FPS
     var timeSinceLastDrop by remember { mutableStateOf(0L) }
-    val countdownDuration = 5  // 5 seconds for the countdown
+    val countdownDuration = 10  // 10 seconds for the countdown
     var remainingTime by remember { mutableStateOf(countdownDuration) }
 //    if (isDoubleTap) {
 //        AlertDialog(
