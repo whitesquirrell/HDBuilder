@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -85,6 +86,8 @@ fun GameScreen(navController: NavController, context: Context){
     // Game Variable
     var buildingX by remember { mutableIntStateOf(0) }
     var buildingY by remember { mutableIntStateOf(0) }
+    var buildingAlpha by remember { mutableFloatStateOf(0.3f) } // Start with 50% transparency
+
 
 
     val localDensity = LocalDensity.current
@@ -197,6 +200,7 @@ fun GameScreen(navController: NavController, context: Context){
 //                .size(BUILDING_SIZE.dp)
                 .size(height = BUILDING_BASE_HEIGHT.dp, width = BUILDING_BASE_WIDTH.dp)
                 .rotate(buildingRotation)
+                .alpha(buildingAlpha)
                 .padding(0.dp),
             contentDescription = null, // Set your content description here
             painter = painterResource(id = buildingDesign)
@@ -271,6 +275,7 @@ fun GameScreen(navController: NavController, context: Context){
         }
 
         // Down is positive offset
+        buildingAlpha = 1f
         isBuildingDropping = false
         buildingYOffset = BUILDING_INIT_Y_OFFSET
         buildingDropSpeed = 1
@@ -286,6 +291,7 @@ fun GameScreen(navController: NavController, context: Context){
             )
         )
         score++
+        buildingAlpha = 0.3f
         stackHeight += BUILDING_VAR_1_HEIGHT
         if (stackHeight > SCREEN_HEIGHT / 2) {
             var lowestBuilding = buildingStackList.removeFirst()
