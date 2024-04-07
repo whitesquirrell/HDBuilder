@@ -111,6 +111,25 @@ fun ScoreScreen(navController: NavController) {
                 }
             }
 
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                    .clickable{ fetchTopScores(scoresRef, topScores) }
+                    .border (
+                        width = 2.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text (
+                    text = "Refresh",
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(start = 8.dp),
+                    color = Color.Black
+                )
+            }
+
             // back button
             Row(
                 modifier = Modifier
@@ -142,16 +161,17 @@ fun ScoreScreen(navController: NavController) {
 // function to fetch scores from db and store within topscores list
 private fun fetchTopScores(scoresRef: DatabaseReference, topScores: MutableList<Score>) {
     scoresRef.get().addOnSuccessListener { dataSnapshot ->
-        val scores = mutableListOf<Score>()
+        var scores = mutableListOf<Score>()
         for (scoreSnapshot in dataSnapshot.children) {
             val score = scoreSnapshot.getValue(Score::class.java)
             if (score != null) {
                 scores.add(score)
             }
         }
-        scores.sortedBy { it.score }
+        scores = scores.sortedByDescending { it.score ?: 0 }.toMutableList()
         topScores.clear()
         topScores.addAll(scores.take(5))
+        topScores.reverse()
     }.addOnFailureListener {
         // Handle failure
     }
