@@ -1,8 +1,6 @@
 package com.example.stacker.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,16 +14,16 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,16 +35,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.stacker.R
 import com.example.stacker.Screen
-import com.google.firebase.database.DatabaseReference
+import com.example.stacker.ThreadPool
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 
 // declare how score object should be stored, with what variables
 data class Score(
     val name: String? = null,
     val score: Int? = null
 )
+
+object ScoreGlobals {
+    // declare which database to use, uses the "scores" directory within db
+    private val Database = FirebaseDatabase.getInstance("https://stacktheblocks-2764e-default-rtdb.asia-southeast1.firebasedatabase.app")
+    val ScoresRef = Database.getReference("scores")
+}
 
 // main screen
 @Composable
@@ -55,17 +57,16 @@ fun ScoreScreen(navController: NavController) {
     // background image, change as needed
     val backgroundImage = painterResource(id = R.drawable.lky_transparent)
 
-    // declare which database to use, uses the "scores" directory within db
-    val database = FirebaseDatabase.getInstance("https://stacktheblocks-2764e-default-rtdb.asia-southeast1.firebasedatabase.app")
-    val myRef = database.getReference("/")
-    val scoresRef = database.getReference("scores")
+    var loadingFlag by remember { mutableStateOf(false) }
 
     // list of top scores
     val topScores = remember { mutableStateListOf<Score>() }
 
+
     // fetches the scores upon opening activity
     LaunchedEffect(Unit) {
-        fetchTopScores(scoresRef, topScores)
+        ThreadPool.execute(ScoreThread(topScores = topScores,
+            setLoadingFlag = { flagValue : Boolean -> loadingFlag = flagValue}))
     }
 
     Box(
@@ -114,7 +115,10 @@ fun ScoreScreen(navController: NavController) {
             Row(
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 16.dp)
-                    .clickable{ fetchTopScores(scoresRef, topScores) }
+                    .clickable{
+                        ThreadPool.execute(ScoreThread(topScores = topScores,
+                            setLoadingFlag = { flagValue : Boolean -> loadingFlag = flagValue}))
+                    }
                     .border (
                         width = 2.dp,
                         color = Color.Black,
@@ -123,7 +127,7 @@ fun ScoreScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text (
-                    text = "Refresh",
+                    text = if (loadingFlag) "Loading..." else "Refresh",
                     fontSize = 30.sp,
                     modifier = Modifier.padding(start = 8.dp),
                     color = Color.Black
@@ -134,7 +138,9 @@ fun ScoreScreen(navController: NavController) {
             Row(
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 16.dp)
-                    .clickable { navController.navigate(Screen.TitleScreen.route) }
+                    .clickable {
+                        navController.navigate(Screen.TitleScreen.route)
+                    }
                     .border(
                         width = 2.dp,
                         color = Color.Black,
@@ -156,11 +162,13 @@ fun ScoreScreen(navController: NavController) {
             }
         }
     }
+
+
 }
 
-// function to fetch scores from db and store within topscores list
-private fun fetchTopScores(scoresRef: DatabaseReference, topScores: MutableList<Score>) {
-    scoresRef.get().addOnSuccessListener { dataSnapshot ->
+// function to fetch scores from db and store within topScores list
+private fun fetchTopScores( topScores: MutableList<Score>) {
+    ScoreGlobals.ScoresRef.get().addOnSuccessListener { dataSnapshot ->
         var scores = mutableListOf<Score>()
         for (scoreSnapshot in dataSnapshot.children) {
             val score = scoreSnapshot.getValue(Score::class.java)
@@ -174,5 +182,28 @@ private fun fetchTopScores(scoresRef: DatabaseReference, topScores: MutableList<
         topScores.reverse()
     }.addOnFailureListener {
         // Handle failure
+    }
+}
+
+class ScoreThread(private val topScores: MutableList<Score>,
+    private val setLoadingFlag: (Boolean) -> Unit) : Runnable {
+    override fun run() {
+        setLoadingFlag(true)
+        ScoreGlobals.ScoresRef.get().addOnSuccessListener { dataSnapshot ->
+            var scores = mutableListOf<Score>()
+            for (scoreSnapshot in dataSnapshot.children) {
+                val score = scoreSnapshot.getValue(Score::class.java)
+                if (score != null) {
+                    scores.add(score)
+                }
+            }
+            scores = scores.sortedByDescending { it.score ?: 0 }.toMutableList()
+            topScores.clear()
+            setLoadingFlag(false)
+            topScores.addAll(scores.take(5))
+            topScores.reverse()
+        }.addOnFailureListener {
+            // Handle failure
+        }
     }
 }
