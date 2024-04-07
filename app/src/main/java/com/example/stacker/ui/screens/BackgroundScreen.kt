@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.stacker.Screen
 import com.example.stacker.R
@@ -41,9 +43,17 @@ fun BackgroundScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "The story so far...",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 30.sp,
+                style = MaterialTheme.typography.displaySmall,
+                modifier = Modifier.padding(16.dp)
+            )
+
             // Replace this text with your story paragraph
             Text(
-                text = "The year is 2124. Overpopulation is on the rise worldwide, and Singapore has once again been hit by another housing crisis. \n" +
+                text = "The year is 2100. Overpopulation is on the rise worldwide, and Singapore has once again been hit by another housing crisis. \n" +
                         "\n" +
                         "Fortunately scientists have managed to bring Lee Kuan Yew back from the grave to steer our great nation out of this dark age.\n" +
                         "\n" +
