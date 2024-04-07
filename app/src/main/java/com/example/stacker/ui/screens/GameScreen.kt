@@ -66,7 +66,6 @@ import kotlin.math.sqrt
 @Composable
 fun GameScreen(navController: NavController, context: Context){
 
-
     // Flags
     var pauseFlag: MutableState<Boolean> = remember { mutableStateOf(false) }
 

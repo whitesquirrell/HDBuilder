@@ -72,6 +72,18 @@ fun TitleScreen(navController: NavController) {
                     modifier = Modifier.padding(start = 30.dp, end= 30.dp)
                 )
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            FloatingActionButton(
+                onClick = { navController.navigate(Screen.SettingsScreen.route) },
+            ) {
+                Text(text = "Settings",
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.displaySmall,
+                    modifier = Modifier.padding(start = 30.dp, end= 30.dp)
+                )
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.example.stacker
 
 import android.content.Context
 import android.icu.text.CaseMap.Title
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,16 +41,18 @@ import com.example.stacker.ui.screens.GameScreen
 import com.example.stacker.ui.screens.ScoreScreen
 import com.example.stacker.ui.screens.TitleScreen
 import com.example.stacker.ui.screens.RecordScoreScreen
+import com.example.stacker.ui.screens.SettingsScreen
 
 object Destinations {
     const val TITLE_SCREEN = "title"
     const val GAME_SCREEN = "game"
     const val SCORE_SCREEN = "score"
+    const val SETTINGS_SCREEN = "settings"
     const val RECORD_SCORE_SCREEN = "record_score"
     const val BACKGROUND_SCREEN = "background"
 }
 @Composable
-fun Navigation(context: Context) {
+fun Navigation(context: Context, main: ComponentActivity) {
     val navController: NavHostController = rememberNavController()
     NavHost(navController = navController, startDestination =  Screen.TitleScreen.route) {
         composable(route = Screen.TitleScreen.route) {
@@ -62,13 +65,13 @@ fun Navigation(context: Context) {
 
         composable(
             route = Screen.GameScreen.route,
-        ){ entry ->
+        ){
             GameScreen(navController = navController, context = context)
         }
 
         composable(
             route = Screen.ScoreScreen.route,
-        ) { entry ->
+        ) {
             ScoreScreen(navController = navController)
         }
 
@@ -77,6 +80,12 @@ fun Navigation(context: Context) {
         ) { backStackEntry ->
             val score: Int = (backStackEntry.arguments?.getString("score"))?.toInt() ?: -1
             RecordScoreScreen(navController = navController, score = score)
+        }
+
+        composable(
+            route = Screen.SettingsScreen.route,
+        ) {
+            SettingsScreen(navController = navController, main = main)
         }
     }
 }
