@@ -17,8 +17,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -36,6 +38,26 @@ fun TitleScreen(navController: NavController) {
         id = R.color.background
     )
 
+    val displayText = remember { mutableStateOf(TextData.textList.random()) }
+    var continueFlag by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        ThreadPool.execute(object : Runnable {
+
+            override fun run() {
+                while (continueFlag) {
+                    val startTime = System.currentTimeMillis()
+                    val endTime = startTime + 5000L // 5 seconds
+
+                    while (System.currentTimeMillis() < endTime) {
+                        Thread.sleep(100) // Sleep for 100 milliseconds
+                    }
+                    displayText.value = TextData.textList.random()
+                }
+            }
+        })
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -50,12 +72,14 @@ fun TitleScreen(navController: NavController) {
             contentScale = ContentScale.Fit // Ensures the image covers the available space
         )
 
-        RandomTextDisplay(
+        Text(
+            text = displayText.value,
+            color = Color.White,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 100.dp)
+                .padding(top = 100.dp),
+            fontSize = 30.sp
         )
-
 
         Column(
             modifier = Modifier
@@ -66,7 +90,10 @@ fun TitleScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(480.dp))
 
             FloatingActionButton(
-                onClick = { navController.navigate(Screen.BackgroundScreen.route) },
+                onClick = {
+                    continueFlag = false
+                    navController.navigate(Screen.BackgroundScreen.route)
+                },
             ) {
                 Text(text = "Start",
                     fontWeight = FontWeight.SemiBold,
@@ -76,11 +103,13 @@ fun TitleScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-
             FloatingActionButton(
                 // use this to debug recordScoreScreen path
 //                onClick = { navController.navigate("record_score_screen/3") },
-                onClick = { navController.navigate(Screen.ScoreScreen.route) },
+                onClick = {
+                    continueFlag = false
+                    navController.navigate(Screen.ScoreScreen.route)
+                },
             ) {
                 Text(text = "Scoreboard",
                     fontWeight = FontWeight.SemiBold,
@@ -92,7 +121,10 @@ fun TitleScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(20.dp))
 
             FloatingActionButton(
-                onClick = { navController.navigate(Screen.SettingsScreen.route) },
+                onClick = {
+                    continueFlag = false
+                    navController.navigate(Screen.SettingsScreen.route)
+                },
             ) {
                 Text(text = "Settings",
                     fontWeight = FontWeight.SemiBold,
@@ -118,11 +150,15 @@ fun RandomTextDisplay(
     modifier: Modifier = Modifier,
 ) {
     val displayText = remember { mutableStateOf(TextData.textList.random()) }
+    var continueFlag by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        val job = ThreadPool.execute(object : Runnable {
+        continueFlag = true
+        println("thread created")
+        ThreadPool.execute(object : Runnable {
             override fun run() {
-                while (true) {
+                while (continueFlag) {
+                    print("CONTINUEFLAG $continueFlag")
                     val startTime = System.currentTimeMillis()
                     val endTime = startTime + 5000L // 5 seconds
 
@@ -130,11 +166,11 @@ fun RandomTextDisplay(
                         Thread.sleep(100) // Sleep for 100 milliseconds
                     }
                     displayText.value = TextData.textList.random()
-
                 }
+                println("loop exiting")
             }
         })
-
+        println("thread dying")
     }
 
     Text(
