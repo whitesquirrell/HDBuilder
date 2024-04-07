@@ -30,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -37,6 +38,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +62,12 @@ import com.example.stacker.Screen
 import com.example.stacker.model.BuildingDetail
 import kotlinx.coroutines.android.awaitFrame
 import kotlin.math.sqrt
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,6 +100,13 @@ fun GameScreen(navController: NavController, context: Context){
     val localDensity = LocalDensity.current
     val haptic = LocalHapticFeedback.current
 
+    // Timer
+    val coroutineScope = rememberCoroutineScope()
+    val elapsedTimer = remember { ElapsedTimer() }
+    val frameTimeMillis = 1000L / 60L  // For 60 FPS
+    var timeSinceLastDrop by remember { mutableStateOf(0L) }
+    val countdownDuration = 5  // 5 seconds for the countdown
+    var remainingTime by remember { mutableStateOf(countdownDuration) }
 //    if (isDoubleTap) {
 //        AlertDialog(
 //            onDismissRequest = { isDoubleTap = false },
@@ -153,6 +168,52 @@ fun GameScreen(navController: NavController, context: Context){
 //    buildingStackList.forEach {building -> stackHeight += building.buildingHeight }
     var stackOffset = SCREEN_HEIGHT - BUILDING_VAR_1_HEIGHT - stackHeight
 
+    // Start the game loop
+    DisposableEffect(Unit) {
+        val job = coroutineScope.launch {
+            var lastUpdateTime = System.currentTimeMillis()
+            var elapsedTimeSinceLastUpdate = 0L
+            while (isActive) {
+                val currentTime = System.currentTimeMillis()
+                val deltaTime = currentTime - lastUpdateTime
+                lastUpdateTime = currentTime
+                elapsedTimeSinceLastUpdate += deltaTime
+
+                while (elapsedTimeSinceLastUpdate >= 1000) {
+                    elapsedTimeSinceLastUpdate -= 1000
+                    remainingTime--
+                }
+
+                if (remainingTime <= 0) {
+                    isBuildingDropping = true
+                    remainingTime = countdownDuration
+                }
+
+
+                val sleepTime = frameTimeMillis - deltaTime % frameTimeMillis
+                if (sleepTime > 0) {
+                    delay(sleepTime)
+                }
+            }
+        }
+
+        onDispose {
+            job.cancel()
+        }
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Time left: $remainingTime",
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 16.dp),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+    }
     // Background
     Box(
     ) {
@@ -163,6 +224,7 @@ fun GameScreen(navController: NavController, context: Context){
             contentScale = ContentScale.FillBounds // Ensures the image covers the available space
         )
     }
+
 
 //    val listState = rememberLazyListState()
     LazyColumn(
@@ -231,7 +293,7 @@ fun GameScreen(navController: NavController, context: Context){
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
-                        isBuildingDropping = true; blockDrop.start(); vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+                        isBuildingDropping = true; blockDrop.start(); vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));  remainingTime = countdownDuration
 
                     },
 //                    onDoubleTap = { isDoubleTap = true; towerCrash.start() }
