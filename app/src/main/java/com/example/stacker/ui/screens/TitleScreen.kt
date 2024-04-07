@@ -31,6 +31,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+object TextData {
+    val textList = listOf(
+        "Make SG Great Again!",
+        "Build The HDBs!",
+        "Make Your Family Proud!",
+        "Do It For Your Country!",
+        "Singapore Is Proud!"
+    )
+}
+
 @Composable
 fun TitleScreen(navController: NavController) {
     val backgroundImage = painterResource(id = R.drawable.hdbuilder)
@@ -104,8 +114,6 @@ fun TitleScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(20.dp))
             FloatingActionButton(
-                // use this to debug recordScoreScreen path
-//                onClick = { navController.navigate("record_score_screen/3") },
                 onClick = {
                     continueFlag = false
                     navController.navigate(Screen.ScoreScreen.route)
@@ -136,47 +144,3 @@ fun TitleScreen(navController: NavController) {
     }
 }
 
-object TextData {
-    val textList = listOf(
-        "Make SG Great Again!",
-        "Build The HDBs!",
-        "Make Your Family Proud!",
-        "Do It For Your Country!",
-        "Singapore Is Proud!"
-    )
-}
-@Composable
-fun RandomTextDisplay(
-    modifier: Modifier = Modifier,
-) {
-    val displayText = remember { mutableStateOf(TextData.textList.random()) }
-    var continueFlag by remember { mutableStateOf(true) }
-
-    LaunchedEffect(Unit) {
-        continueFlag = true
-        println("thread created")
-        ThreadPool.execute(object : Runnable {
-            override fun run() {
-                while (continueFlag) {
-                    print("CONTINUEFLAG $continueFlag")
-                    val startTime = System.currentTimeMillis()
-                    val endTime = startTime + 5000L // 5 seconds
-
-                    while (System.currentTimeMillis() < endTime) {
-                        Thread.sleep(100) // Sleep for 100 milliseconds
-                    }
-                    displayText.value = TextData.textList.random()
-                }
-                println("loop exiting")
-            }
-        })
-        println("thread dying")
-    }
-
-    Text(
-        text = displayText.value,
-        color = Color.White,
-        modifier = modifier,
-        fontSize = 30.sp
-    )
-}

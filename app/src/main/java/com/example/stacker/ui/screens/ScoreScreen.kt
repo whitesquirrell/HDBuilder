@@ -62,11 +62,14 @@ fun ScoreScreen(navController: NavController) {
     // list of top scores
     val topScores = remember { mutableStateListOf<Score>() }
 
-
     // fetches the scores upon opening activity
     LaunchedEffect(Unit) {
-        ThreadPool.execute(ScoreThread(topScores = topScores,
-            setLoadingFlag = { flagValue : Boolean -> loadingFlag = flagValue}))
+        ThreadPool.execute(
+            ScoreThread(
+                topScores = topScores,
+                setLoadingFlag = { flagValue : Boolean -> loadingFlag = flagValue}
+            )
+        )
     }
 
     Box(
@@ -78,7 +81,8 @@ fun ScoreScreen(navController: NavController) {
             painter = backgroundImage,
             contentDescription = "Background",
             modifier = Modifier.matchParentSize(),
-            contentScale = ContentScale.FillBounds // Ensures the image covers the available space
+            contentScale = ContentScale.FillBounds
+            // Ensures the image covers the available space
         )
 
         Column (
@@ -101,14 +105,15 @@ fun ScoreScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // change n within the take() to change number of scores you want to show
-                itemsIndexed(topScores.take(5).reversed()) { index, score ->
-                    Text(
-                        text = "${index + 1}. ${score.name} - ${score.score}",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 30.sp,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                itemsIndexed(topScores.take(5).reversed()) {
+                   index, score ->
+                        Text(
+                            text = "${index + 1}. ${score.name} - ${score.score}",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 30.sp,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
                 }
             }
 
@@ -116,8 +121,12 @@ fun ScoreScreen(navController: NavController) {
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 16.dp)
                     .clickable{
-                        ThreadPool.execute(ScoreThread(topScores = topScores,
-                            setLoadingFlag = { flagValue : Boolean -> loadingFlag = flagValue}))
+                        ThreadPool.execute(
+                            ScoreThread(
+                                topScores = topScores,
+                                setLoadingFlag = { flagValue : Boolean -> loadingFlag = flagValue}
+                            )
+                        )
                     }
                     .border (
                         width = 2.dp,
@@ -137,7 +146,10 @@ fun ScoreScreen(navController: NavController) {
             // back button
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                    .padding(
+                        horizontal = 20.dp,
+                        vertical = 16.dp
+                    )
                     .clickable {
                         navController.navigate(Screen.TitleScreen.route)
                     }
@@ -162,33 +174,13 @@ fun ScoreScreen(navController: NavController) {
             }
         }
     }
-
-
-}
-
-// function to fetch scores from db and store within topScores list
-private fun fetchTopScores( topScores: MutableList<Score>) {
-    ScoreGlobals.ScoresRef.get().addOnSuccessListener { dataSnapshot ->
-        var scores = mutableListOf<Score>()
-        for (scoreSnapshot in dataSnapshot.children) {
-            val score = scoreSnapshot.getValue(Score::class.java)
-            if (score != null) {
-                scores.add(score)
-            }
-        }
-        scores = scores.sortedByDescending { it.score ?: 0 }.toMutableList()
-        topScores.clear()
-        topScores.addAll(scores.take(5))
-        topScores.reverse()
-    }.addOnFailureListener {
-        // Handle failure
-    }
 }
 
 class ScoreThread(private val topScores: MutableList<Score>,
     private val setLoadingFlag: (Boolean) -> Unit) : Runnable {
     override fun run() {
         setLoadingFlag(true)
+        // function to fetch scores from db and store within topScores list
         ScoreGlobals.ScoresRef.get().addOnSuccessListener { dataSnapshot ->
             var scores = mutableListOf<Score>()
             for (scoreSnapshot in dataSnapshot.children) {

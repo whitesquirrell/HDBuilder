@@ -35,7 +35,6 @@ fun SettingsScreen(navController: NavController, main: ComponentActivity) {
     )
 
     var fullScreenFlag by remember { mutableStateOf(false) }
-//    var screenHeight = getScreenHeight()
 
     Box(
         modifier = Modifier

@@ -60,7 +60,8 @@ fun RecordScoreScreen(navController: NavController, score: Int) {
             modifier = Modifier
                 .fillMaxSize()
                 .offset(y = (-50).dp),
-            contentScale = ContentScale.Fit // Ensures the image covers the available space
+            contentScale = ContentScale.Fit
+            // Ensures the image covers the available space
         )
 
         Column(
@@ -69,18 +70,23 @@ fun RecordScoreScreen(navController: NavController, score: Int) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Spacer(modifier = Modifier.height(480.dp))
 
-            Text("Your score is $score, thank you for your service! Enter your name to record your score in the history books.",
+            Text(
+                text = "Your score is $score, thank you for your service! Enter your name to record your score in the history books.".trimMargin(),
                 fontSize = 15.sp,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Center
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             TextField(
                 value = text,
                 onValueChange = { text = it },
-                label = { Text("Name") }
+                label = {
+                    Text(text = "Name")
+                }
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -89,9 +95,11 @@ fun RecordScoreScreen(navController: NavController, score: Int) {
                 onClick = {
                     showNotification(context)
                     submitScore(name = text, score = score)
-                    navController.navigate(Screen.TitleScreen.route) },
+                    navController.navigate(Screen.TitleScreen.route)
+                },
             ) {
-                Text(text = "Submit and Return",
+                Text(
+                    text = "Submit and Return",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.displaySmall,
