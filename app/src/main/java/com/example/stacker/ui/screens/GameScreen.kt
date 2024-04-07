@@ -110,15 +110,15 @@ fun GameScreen(navController: NavController, context: Context){
     val SCREEN_HEIGHT = getScreenHeight();
     val GRAVITATIONAL_CONSTANT = 10
 
-    val BUILDING_BASE_HEIGHT = 2 * 58
-    val BUILDING_BASE_WIDTH = 2 * 74
-    val BUILDING_VAR_1_HEIGHT = 2 * 51
-    val BUILDING_VAR_1_WIDTH = 2 * 72
+    val BUILDING_BASE_HEIGHT = 1 * 58
+    val BUILDING_BASE_WIDTH = 1 * 74
+    val BUILDING_VAR_1_HEIGHT = 1 * 51
+    val BUILDING_VAR_1_WIDTH = 1 * 72
 
 //    val BUILDING_SIZE = 150
 //    val BUILDING_INIT_DIFFICULTY = 50
     val BUILDING_INIT_X_OFFSET = 0
-    val BUILDING_INIT_Y_OFFSET = BUILDING_VAR_1_HEIGHT
+    val BUILDING_INIT_Y_OFFSET = BUILDING_VAR_1_HEIGHT * 2
     val BUILDING_DROP_STOP_Y_OFFSET = playableAreaHeightDP/3
 //    val BUILDING_STACK_ADD_OFFSET = BUILDING_SIZE/4 + 8
 //    val BUILDING_STACK_BASE_OFFSET = BUILDING_SIZE/10 + 2
@@ -264,7 +264,8 @@ fun GameScreen(navController: NavController, context: Context){
             return
         }
 
-        if(!(buildingXOffset <= SCREEN_WIDTH/2 && buildingXOffset > (SCREEN_WIDTH/2)-BUILDING_BASE_WIDTH)){
+        if(!(buildingXOffset <=  ((buildingStackList[buildingStackList.size-1].buildingXOffset)+BUILDING_BASE_WIDTH/2) &&
+                    buildingXOffset >= ((buildingStackList[buildingStackList.size-1].buildingXOffset)-BUILDING_BASE_WIDTH/2) )){
 
             //Simple Lose effect :)
             buildingRotation = 180f
@@ -300,7 +301,7 @@ fun GameScreen(navController: NavController, context: Context){
         if(buildingNumber % 5 == 0){
             buildingMovementSpeed += 1
         }
-        buildingXOffset = BUILDING_INIT_X_OFFSET
+        buildingXOffset = (0..SCREEN_WIDTH-BUILDING_BASE_WIDTH).random()
     }
 }
 
