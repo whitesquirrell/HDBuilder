@@ -8,6 +8,8 @@ import android.os.IBinder
 class BackgroundMusicService: Service() {
     private lateinit var mediaPlayer: MediaPlayer
 
+
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -17,6 +19,7 @@ class BackgroundMusicService: Service() {
         mediaPlayer = MediaPlayer.create(this, R.raw.home)
         mediaPlayer.isLooping = true
         mediaPlayer.setVolume(1.0f, 1.0f) //max volume
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
